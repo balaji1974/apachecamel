@@ -1,4 +1,4 @@
-# apachecamel
+# Apache Camel
 
 ## Apache camel is a ETL framework for enterprise integration pattern that is used for routing and mediation rules.
 
