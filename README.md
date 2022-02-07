@@ -1,6 +1,8 @@
 # Apache Camel
 
 ## Apache camel is a ETL framework for enterprise integration pattern that is used for routing and mediation rules.
+## Provides 100+ components for databases, message queues, APIs, cloud integration etc
+## Supports 200+ protocols, transports and data formats (& 300+ converters) 
 
 ### It has two main use cases 
 ### transform - changes the body of the message 
@@ -20,3 +22,14 @@
 
 ### Please check the pom.xml file for dependencies needed and the application.properties files for the activemq broker url
 
+
+**************************
+
+## Create two microservices microservice-a and microservice-b
+
+
+
+
+
+Reference:
+https://www.udemy.com/course/apache-camel-framework-with-spring-boot
