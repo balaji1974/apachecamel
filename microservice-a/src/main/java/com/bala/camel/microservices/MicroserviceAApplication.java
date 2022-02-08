@@ -1,4 +1,4 @@
-package com.bala.camel.microservicea;
+package com.bala.camel.microservices;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
