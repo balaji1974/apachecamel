@@ -68,7 +68,7 @@ Here we call our own class which will have the process logic after which we writ
 This will move files from a source folder to a destination folder the moment it is placed on the source folder. 
 In turn it will read the content of the file which can also be processed/transformed if needed 
 
-6. ActiveMQSenderRouter
+6. ActiveMQSenderRouter (related - ActiveMQReceiverRouter)
 This will put a message into the ActiveMQ message queue in a specified duration set by the timer (queue must be created first on activemq)
 For this to work add the below dependency to the pom.xml file
 <dependency>
@@ -78,6 +78,9 @@ For this to work add the below dependency to the pom.xml file
 </dependency>
 Also add the following to the application.properties file: 
 spring.activemq.broker-url=tcp://localhost:61616
+
+7. JsonFileToApacheMQSender (related - ActiveMQToJsonConverter)
+This will put a message into the ActiveMQ message queue once a file is added into the directory called json inside the date folder. 
 
 
 ```
@@ -94,7 +97,7 @@ Default user id and pwd: admin & admin
 
 ## microservice-b
 ```xml
-6. ActiveMQReceiverRouter
+1. ActiveMQReceiverRouter (related - ActiveMQSenderRouter)
 This will get a message from the ActiveMQ message queue as soon as it has been put by the producer 
 For this to work add the below dependency to the pom.xml file
 <dependency>
@@ -106,6 +109,20 @@ Also add the following to the application.properties file:
 server.port=8000
 spring.activemq.broker-url=tcp://localhost:61616
 
+
+2. ActiveMQToJsonConverter (related - JsonFileToApacheMQSender)
+This will read the activemq message and convert the message body that is received in a json format to the associated class file 
+First add the following dependency into pom.xml which will help us to map the Json format that is received and convert it into a class 
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-jackson-starter</artifactId>
+	<version>3.14.1</version>
+</dependency>
+
+Next add the mapped class called CurrencyConverter into the utils package. This class is used for mapping the json body tha is received. 
+
+
+
 ```
 
 
@@ -113,3 +130,4 @@ spring.activemq.broker-url=tcp://localhost:61616
 
 Reference:
 https://www.udemy.com/course/apache-camel-framework-with-spring-boot
+https://camel.apache.org/components/3.14.x/
