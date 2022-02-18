@@ -26,7 +26,11 @@ Exchange - Request + Response
 	Exchange ID
 	Message Exchange Pattern (MEP) - InOnly/InOut
 	Input Message and (Optional) Output Message
+
+DSL - Camel uses Domain Specification Language 
 ```
+
+## Important Note: To run any of the below programs, please remove the @Component tag inside the router package of that program 
 
 ### 1) MyFirstTimerRouter - General sample that shows the ability of camel transformation and processing
 
@@ -85,6 +89,35 @@ This will put a message into the ActiveMQ message queue once a file is added int
 8. XMLFileToApacheMQSender
 This will put a message into the ActiveMQ message queue once a file is added into the directory called xml inside the data folder. 
 
+9. Kafka Producer: (KafkaSenderRouter)
+For installing and starting Kafka I have detail instruction in my Kakfa repo.
+Add the following Kafka dependency:
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-kafka-starter</artifactId>
+	<version>3.14.1</version>
+</dependency>
+
+Add the following in the properties file
+camel.component.kafka.brokers=localhost:9092
+
+Next configure the router. Refer KafkaSenderRouter.java
+
+10. Rest API Consumer (RestAPIConsumerRouter.java)
+We need to add the following dependency for making REST API calls using camel: 
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-http-starter</artifactId>
+	<version>3.14.1</version>
+</dependency>
+
+This example makes a rest call every 10 seconds 
+
+11. Choice / Decision making in routing (ChoiceRouter.java)
+This will check the file extension and based on the file type, it will perform action
+
+Check the camel simple language options that can be used from the following url:
+https://camel.apache.org/components/3.15.x/languages/simple-language.html
 
 ```
 
@@ -125,8 +158,31 @@ First add the following dependency into pom.xml which will help us to map the Js
 Next add the mapped class called CurrencyConverter into the utils package. This class is used for mapping the json body tha is received. 
 
 
-3. 
+3. ApacheMQToXMLProcessorTransfomer
+This will read a message from the ActiveMQ message queue and convert it to xml format and send it to log file. 
 
+Dependency needed for this is 
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-jacksonxml-starter</artifactId>
+	<version>3.14.1</version>
+</dependency>
+
+4. Kafka Consumer: (KafkaReceiverRouter.java)
+For installing and starting Kafka I have detail instruction in my Kakfa repo.
+Add the following Kafka dependency:
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-kafka-starter</artifactId>
+	<version>3.14.1</version>
+</dependency>
+
+Add the following in the properties file
+camel.component.kafka.brokers=localhost:9092
+
+Next configure the router. Refer KafkaReceiverRouter.java
+
+5. Creating a rest end point that will send data (SimpleController.java)
 
 ```
 
@@ -136,3 +192,4 @@ Next add the mapped class called CurrencyConverter into the utils package. This 
 Reference:
 https://www.udemy.com/course/apache-camel-framework-with-spring-boot
 https://camel.apache.org/components/3.14.x/
+https://camel.apache.org/components/3.15.x/languages/simple-language.html
