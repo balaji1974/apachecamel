@@ -80,7 +80,10 @@ Also add the following to the application.properties file:
 spring.activemq.broker-url=tcp://localhost:61616
 
 7. JsonFileToApacheMQSender (related - ActiveMQToJsonConverter)
-This will put a message into the ActiveMQ message queue once a file is added into the directory called json inside the date folder. 
+This will put a message into the ActiveMQ message queue once a file is added into the directory called json inside the data folder. 
+
+8. XMLFileToApacheMQSender
+This will put a message into the ActiveMQ message queue once a file is added into the directory called xml inside the data folder. 
 
 
 ```
@@ -121,6 +124,8 @@ First add the following dependency into pom.xml which will help us to map the Js
 
 Next add the mapped class called CurrencyConverter into the utils package. This class is used for mapping the json body tha is received. 
 
+
+3. 
 
 
 ```

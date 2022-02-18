@@ -10,7 +10,7 @@ import com.bala.camel.microserviceb.utils.MyCurrencyExchangeProcessor;
 import com.bala.camel.microserviceb.utils.MyCurrencyExchangeTransformer;
 
 //@Component
-public class ActiveMQToJsonProcessorTransformer extends RouteBuilder{
+public class ActiveMQToXMLProcessorTransformer extends RouteBuilder{
 	
 	@Autowired
 	MyCurrencyExchangeProcessor myCurrencyExchangeProcessor;
@@ -20,8 +20,9 @@ public class ActiveMQToJsonProcessorTransformer extends RouteBuilder{
 
 	@Override
 	public void configure() throws Exception {
-		from("activemq:my-json-reader") // Read the messages fom an activemq queue  my-json-reader
-		.unmarshal().json(JsonLibrary.Jackson, CurrencyConverter.class) // This will read the message body in json format and convert it into java class file
+		from("activemq:my-xml-reader") // Read the messages fom an activemq queue  my-json-reader
+		.unmarshal()
+		.jacksonxml(CurrencyConverter.class) // This will read the message body in xml format and convert it into java class file
 		.bean(myCurrencyExchangeProcessor)
 		.bean(myCurrencyExchangeTransformer)
 		.to("log:received-msg-from-activemq"); // Write it to the output log
