@@ -4,7 +4,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
 
 //@Component
-public class ChoiceRouter extends RouteBuilder {
+public class ReusableLogRoutes extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
@@ -25,8 +25,15 @@ public class ChoiceRouter extends RouteBuilder {
 			.otherwise() // else statment 
 				.log("This is not a XML file") // Log it as not an xml file 
 		.end()
-		.log("${messageHistory}") // The entire message history will be printed - orignation / destination etc
+		.to("direct://log-data")
 		.to("file:data/output"); // Destination directory to which the file will be moved 
+		
+		
+		// this will create a reusable component block that can be used in the entire camel context 
+		from("direct:log-data")
+		.log("${messageHistory} ${file:absolute.path}")
+		.log("${file:name} ${file:ext} ")
+		; 
 	}
 
 }

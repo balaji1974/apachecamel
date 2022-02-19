@@ -47,6 +47,25 @@ DSL - Camel uses Domain Specification Language
 ### Please check the pom.xml file for dependencies needed and the application.properties files for the activemq broker url
 
 
+## Minimum dependencies needed for Apache Camel Spring boot applications to run 
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-spring-boot-starter</artifactId>
+	<version>3.15.0</version>
+</dependency>
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-devtools</artifactId>
+	<scope>runtime</scope>
+	<optional>true</optional>
+</dependency>
+```
+
 ************************** Rearranged the above examples with more comments below *********************************************
 
 ## Create two microservices microservice-a and microservice-b
@@ -119,6 +138,19 @@ This will check the file extension and based on the file type, it will perform a
 Check the camel simple language options that can be used from the following url:
 https://camel.apache.org/components/3.15.x/languages/simple-language.html
 
+12. Create a reusable camel component that can be used in the entire camel context (ReusableLogRoutes.java)
+// this will create a reusable component block that can be used in the entire camel context 
+from("direct:log-data")
+.log("${messageHistory} ${file:absolute.path}")
+.log("${file:name} ${file:ext} ")
+; 
+
+This can be used in our routing in the following way: 
+.to("direct://log-data")
+
+13. Handling complex decision making choices with a Decider Bean (ComplexDeciderRoutes.java)
+Complex decision making can be delgated to its own bean and this example shows this scenario. 
+
 ```
 
 ## launch activemq on docker 
@@ -184,8 +216,65 @@ Next configure the router. Refer KafkaReceiverRouter.java
 
 5. Creating a rest end point that will send data (SimpleController.java)
 
+6. ActiveMQExcelReceiver 
+(this will read messages that are sent from the SplitterPattern.java program under the enterprise Integration Patterns )
+Also add the following the application.properties file: 
+spring.activemq.broker-url=tcp://localhost:61616
+spring.activemq.packages.trust-all=true 
+
+7. ActiveMQStringSeperatorReceiver
+(this will read messages that are sent from the SplitBySeperator.java program under the enterprise Integration Patterns )
+
 ```
 
+
+## Enterprise Integration Patterns 
+```xml
+1. Pipeline Pattern (PipelinePattern.java) 
+Here data flow is through a pipeline 
+
+2. Multicast Pattern (MutlicastPattern.java)
+Here data can be channelled to mulitple end points
+
+3. Content Based Routing Pattern (ContentBasedRoutingPattern.java)
+We can route based on the content - Eg. using choice()
+
+4. Splitter Routing Pattern (SplitterPattern.java)
+Add the following dependency 
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-csv-starter</artifactId>
+	<version>3.15.0</version>
+</dependency>
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-activemq-starter</artifactId>
+	<version>3.15.0</version>
+</dependency>
+
+Add the following to the application.properties file:
+spring.activemq.broker-url=tcp://localhost:61616
+
+Here each line in the excel will be spilt as a seperate message and processed and sent to activemq
+
+For the receiving part of this message please refer to ActiveMQExcelReceiver.java in the microservice-b project 
+
+5. Split messages based on a seperator (SplitBySeperator.java)
+This will split the file by a seperator that is specified and send each item from the split as a message 
+
+6. Aggregator Pattern (AggregatorPattern.java)
+Please add the following dependency 
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-jackson-starter</artifactId>
+	<version>3.15.0</version>
+</dependency>
+
+This will look for the body of the json to contain 'to' string and then add 3 such messages into a single message and send it to the defined output 
+
+This follows an AggregationStrategy defined in ArrayListAggregationStrategy.java 
+
+```
 
 
 

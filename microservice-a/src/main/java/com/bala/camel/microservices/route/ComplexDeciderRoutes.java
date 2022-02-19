@@ -1,10 +1,16 @@
 package com.bala.camel.microservices.route;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-//@Component
-public class ChoiceRouter extends RouteBuilder {
+import com.bala.camel.microservices.utils.DeciderBean;
+
+@Component
+public class ComplexDeciderRoutes extends RouteBuilder {
+	
+	@Autowired
+	DeciderBean deciderBean;
 
 	@Override
 	public void configure() throws Exception {
@@ -20,13 +26,12 @@ public class ChoiceRouter extends RouteBuilder {
 		.choice()
 			.when(simple("${file:ext} ends with 'xml'")) // if the file extension ends with XML 
 				.log("This is a XML file") // Log it as xml file 
-			.when(simple("${body} contains  'USD'")) // if the file body contains USD and not an XML file
+			.when(method(deciderBean)) // call a method that will handle complex logic 
 				.log("This is not a XML file but contains USD") // Log it as xml file 
 			.otherwise() // else statment 
 				.log("This is not a XML file") // Log it as not an xml file 
 		.end()
-		.log("${messageHistory}") // The entire message history will be printed - orignation / destination etc
 		.to("file:data/output"); // Destination directory to which the file will be moved 
+		
 	}
-
 }

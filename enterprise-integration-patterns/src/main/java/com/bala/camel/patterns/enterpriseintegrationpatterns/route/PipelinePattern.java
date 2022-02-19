@@ -1,10 +1,10 @@
-package com.bala.camel.microservices.route;
+package com.bala.camel.patterns.enterpriseintegrationpatterns.route;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
 
 //@Component
-public class ChoiceRouter extends RouteBuilder {
+public class PipelinePattern extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
@@ -15,6 +15,7 @@ public class ChoiceRouter extends RouteBuilder {
 		 * 
 		 */
 		from("file:data/input") // Source directory 
+		.pipeline() // This is default and can be omitted
 		.routeId("XML-CHOICE-ROUTE") // This will give a route id to our route 
 		.transform().body(String.class) // We need to transform the body before we can parse and read its contents 
 		.choice()
