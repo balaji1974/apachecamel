@@ -239,7 +239,7 @@ Here data can be channelled to mulitple end points
 3. Content Based Routing Pattern (ContentBasedRoutingPattern.java)
 We can route based on the content - Eg. using choice()
 
-4. Splitter Routing Pattern (SplitterPattern.java)
+4 a. Splitter Routing Pattern (SplitterPattern.java)
 Add the following dependency 
 <dependency>
 	<groupId>org.apache.camel.springboot</groupId>
@@ -259,10 +259,10 @@ Here each line in the excel will be spilt as a seperate message and processed an
 
 For the receiving part of this message please refer to ActiveMQExcelReceiver.java in the microservice-b project 
 
-5. Split messages based on a seperator (SplitBySeperator.java)
+4 b. Split messages based on a seperator (SplitBySeperator.java)
 This will split the file by a seperator that is specified and send each item from the split as a message 
 
-6. Aggregator Pattern (AggregatorPattern.java)
+5. Aggregator Pattern (AggregatorPattern.java)
 Please add the following dependency 
 <dependency>
 	<groupId>org.apache.camel.springboot</groupId>
@@ -270,12 +270,103 @@ Please add the following dependency
 	<version>3.15.0</version>
 </dependency>
 
-This will look for the body of the json to contain 'to' string and then add 3 such messages into a single message and send it to the defined output 
+This will look for the body of the json to contain 'to' string and then add 3 such messages into a single message - aggregate everything based on the to tag and send it to the defined output 
 
 This follows an AggregationStrategy defined in ArrayListAggregationStrategy.java 
 
+6. Routing Slip Pattern (RoutingSlipPattern.java)
+Here we can dynamically route to any endpoints based on a routing slip that we configure 
+
+6. Dynamic Routing Pattern (DynamicRoutingPattern.java)
+Route to different endpoints upon completing of different parts of the program (steps)
+
+
 ```
 
+
+## Best Practises 
+```xml
+1. We can define property variables and use it in our camel configuations.
+Eg. in application.properties
+end-point-for-logging=log:endpoint1
+
+and we can use this like:
+from("direct:endpoint1")
+.to({{end-point-for-logging}});
+
+2. To keep the camel context JVM to run continously even when not installing the with spring-boot-starter-web, 
+typically when using the spring boot in standalone mode is to set the below in your application.properties file: 
+camel.springboot.main-run-controller=true 
+
+To shut down a Camel application after a fixed period of time:
+camel.springboot.duration-max-seconds=60
+
+3. Set the logging levels appropriately. Eg. 
+logging.level.org.apache.camel.spring.boot=INFO 
+logging.level.org.apache.camel.impl=DEBUG
+
+4. Enable tracing to check detail information of the routing from the class that implements the RouteBuilder 
+getContext().setTracing(true); 
+
+5. Configure a dead letter queue (to ensure that no message is lost) on the class that implements the RouteBuilder 
+errorHandler(deadLetterChannel("activemq:dead-letter-queue")); 
+
+6. Wire Tap from the EIP patterns allows you to route messages to a separate location while they are being forwarded to the ultimate destination. Eg. 
+from("direct:endpoint1")
+	.wireTap("log:wiretap-log")
+	.to("log:endpoint1");
+
+7. Secure messages with encryption
+a. Add the dependency in pom.xml 
+<dependency>
+	<groupId>org.apache.camel.springboot</groupId>
+	<artifactId>camel-crypto-starter</artifactId>
+	<version>3.15.0</version>
+</dependency>
+
+b. Create keys
+keytool -genseckey -alias myDesKey -keypass someKeyPassword -keystore myDesKey.jceks -storepass someKeystorePassword -v -storetype JCEKS -keyalg DES
+
+c. Put the generated key file in the classpath of the both the sender and receiver projects 
+
+d. Method to read from Key Store, add this in the RouteBuilder class of both the sender and receiver java files. 
+private CryptoDataFormat createEncryptor() throws KeyStoreException, IOException, NoSuchAlgorithmException,
+		CertificateException, UnrecoverableKeyException {
+	KeyStore keyStore = KeyStore.getInstance("JCEKS");
+	ClassLoader classLoader = getClass().getClassLoader();
+	keyStore.load(classLoader.getResourceAsStream("myDesKey.jceks"), "someKeystorePassword".toCharArray());
+	Key sharedKey = keyStore.getKey("myDesKey", "someKeyPassword".toCharArray());
+
+	CryptoDataFormat sharedKeyCrypto = new CryptoDataFormat("DES", sharedKey);
+	return sharedKeyCrypto;
+}
+
+e. Finally use this encryptor function:
+from("timer:active-mq-timer?period=10000") // A timer that gets triggered every 10 seconds - 10000 milliseconds
+		.transform().constant("My ActiveMQ constant message") // Sends a constant message 
+		.log("${body}")
+		.marshall(createEncryptor()) // Encryption is done here before sending the message 
+		.to("activemq:my-activemq-queue"); // Sends it to the ActiveMQ queue my-activemq-queue - This must be created first in activemq
+
+
+f. And on the receiving side we need to do the following for decrypting the message:
+from("activemq:my-activemq-queue") // Read the messages fom an activemq queue  my-activemq-queue
+		.unmarshall(createEncryptor()) // Decrypt is done here after receving the message 
+		.to("log:received-msg-from-activemq"); // Write it to the output log
+
+```
+
+## Useful links 
+
+```xml
+Why Camel? - https://camel.apache.org/manual/latest/faq/why-the-name-camel.html
+Camel Examples - https://github.com/apache/camel-examples/tree/master/examples
+Camel Spring Boot Configuration - https://camel.apache.org/camel-spring-boot/latest/spring-boot.html
+Complete Spring Boot Starters List - https://camel.apache.org/camel-spring-boot/latest/list.html 
+Camel Spring Boot Examples - https://github.com/apache/camel-spring-boot-examples
+Enterprise Integration Patterns - https://camel.apache.org/components/latest/eips/enterprise-integrationpatterns.html
+
+``` 
 
 
 Reference:
