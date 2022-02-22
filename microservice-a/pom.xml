@@ -45,6 +45,23 @@
 			<artifactId>camel-http-starter</artifactId>
 			<version>3.14.1</version>
 		</dependency>
+		
+		<dependency>
+		  <groupId>org.apache.camel.springboot</groupId>
+		  <artifactId>camel-servlet-starter</artifactId>
+		  <version>3.14.1</version>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.camel.springboot</groupId>
+		  <artifactId>camel-jackson-starter</artifactId>
+		  <version>3.14.1</version>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.camel.springboot</groupId>
+		  <artifactId>camel-swagger-java-starter</artifactId>
+		  <version>3.14.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>

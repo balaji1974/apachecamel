@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.bala.camel.microservices.utils.DeciderBean;
 
-@Component
+//@Component
 public class ComplexDeciderRoutes extends RouteBuilder {
 	
 	@Autowired
